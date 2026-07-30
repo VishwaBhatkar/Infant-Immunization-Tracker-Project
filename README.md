@@ -1,2 +1,2 @@
-# Infant-Immunization-Tracker-Project
+# Child Vaccination & Immunization Tracking System
 CDAC PROJECT
