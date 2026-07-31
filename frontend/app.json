@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Child Vaccination",
+    "slug": "child-vaccination",
+    "scheme": "childvax",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "color": "#2563EB"
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.vishwa.childvaccination",
+      "permissions": [
+        "POST_NOTIFICATIONS",
+        "VIBRATE"
+      ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.vishwa.childvaccination",
+      "supportsTablet": true
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiPort": 5000,
+      "router": {},
+      "eas": {
+        "projectId": "1f7e7c31-b844-4397-af98-471905946ae7"
+      }
+    },
+    "owner": "vishwabhatkar"
+  }
+}
