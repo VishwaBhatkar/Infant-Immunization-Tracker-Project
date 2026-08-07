@@ -1,9 +1,16 @@
+/**
+ * File: frontend/src/app/(parent)/children.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, Image, Pressable, Platform, StyleSheet, Text, View } from 'react-native';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
-import { api } from '@/services/api';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { api } from '@/services/apiService';
 import { useApp } from '@/context/AppContext';
-import { showToast } from '@/components/Feedback';
+import { showToast } from '@/components/ui/Feedback';
 const emptyForm = {
     name: '', dob: '', gender: 'MALE', blood_group: '', birth_weight_kg: '',
     current_weight_kg: '', allergies: '', medical_notes: '', profile_image_url: ''

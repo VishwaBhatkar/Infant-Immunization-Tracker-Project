@@ -1,7 +1,14 @@
+/**
+ * File: frontend/src/app/(system-admin)/reports.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
 import { useApp } from '@/context/AppContext';
 export default function ReportsScreen() {
     const { theme } = useApp();

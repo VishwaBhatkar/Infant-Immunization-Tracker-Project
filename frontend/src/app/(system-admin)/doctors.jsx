@@ -1,9 +1,17 @@
+/**
+ * File: frontend/src/app/(system-admin)/doctors.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
-import { confirmAction } from '@/utils/confirmAction';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { confirmAction } from '@/utils/confirmationUtils';
 import { useApp } from '@/context/AppContext';
+import { showToast } from '@/components/ui/Feedback';
 const emptyForm = { name: '', email: '', phone: '', password: '', hospitalIds: '' };
 export default function DoctorsScreen() {
     const { theme } = useApp();
@@ -44,7 +52,7 @@ export default function DoctorsScreen() {
                 await api.put(`/admin/doctors/${form.id}`, payload);
             else
                 await api.post('/admin/doctors', payload);
-            Alert.alert('Success', form.id ? 'Doctor updated successfully.' : 'Doctor created successfully.');
+            showToast(form.id ? 'Doctor updated successfully.' : 'Doctor created successfully.');
             setForm(emptyForm);
             await load(form.id ? pagination.page : 1);
         }

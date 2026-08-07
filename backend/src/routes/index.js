@@ -1,38 +1,59 @@
+/**
+ * File: backend/src/routes/index.js
+ * Purpose: Defines API routes and connects each endpoint to its validation, authorization, and controller handlers.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import rateLimit from 'express-rate-limit';
-import { register, login, me } from '../controllers/auth.controller.js';
-import * as c from '../controllers/app.controller.js';
-import { registerRules, loginRules } from '../validators/auth.validators.js';
-import { validate } from '../middleware/validate.js';
-import { authenticate, authorizeRoles } from '../middleware/auth.js';
+import { register, login, me } from '../controllers/authController.js';
+import * as c from '../controllers/appController.js';
+import { registerRules, loginRules } from '../validators/authValidators.js';
+import { validate } from '../middleware/validationMiddleware.js';
+import { authenticate, authorizeRoles } from '../middleware/authMiddleware.js';
 import { ROLES, ADMIN_ROLES } from '../constants/roles.js';
-import { adminLimiter, adminNoStore } from '../middleware/security.js';
-import * as admin from '../controllers/admin.controller.js';
-import * as adminNotification from '../controllers/adminNotification.controller.js';
-import * as adminReport from '../controllers/adminReport.controller.js';
-import { adminUserListRules, adminUserIdRules, updateAdminUserStatusRules, deleteAdminUserRules, adminDoctorListRules, adminDoctorIdRules, createAdminDoctorRules, updateAdminDoctorRules, adminHospitalListRules, adminHospitalIdRules, createAdminHospitalRules, updateAdminHospitalRules, adminChildListRules, adminChildIdRules, adminNotificationListRules, adminNotificationIdRules, sendAdminNotificationRules, cancelAdminNotificationRules, adminAccountListRules, adminAccountIdRules, createAdminAccountRules, updateAdminAccountRules, resetAdminPasswordRules } from '../validators/admin.validators.js';
-import * as dashboard from '../controllers/dashboard.controller.js';
-import * as profile from '../controllers/profile.controller.js';
-import { updateProfileRules, changePasswordRules, deleteAccountRules } from '../validators/profile.validators.js';
-import * as child from '../controllers/child.controller.js';
-import { childIdRules, createChildRules, updateChildRules } from '../validators/child.validators.js';
-import * as vaccine from '../controllers/vaccine.controller.js';
-import { vaccineIdRules, vaccineListRules, createVaccineRules, updateVaccineRules } from '../validators/vaccine.validators.js';
-import * as schedule from '../controllers/schedule.controller.js';
-import { childScheduleIdRules, generateScheduleRules, scheduleListRules } from '../validators/schedule.validators.js';
-import * as immunization from '../controllers/immunization.controller.js';
-import { createRecordRules, recordIdRules, recordListRules, updateRecordRules } from '../validators/immunization.validators.js';
-import * as appointment from '../controllers/appointment.controller.js';
-import { appointmentIdRules, availabilityRules, createAppointmentRules, listAppointmentRules, rescheduleRules, statusRules } from '../validators/appointment.validators.js';
-import * as reminder from '../controllers/reminder.controller.js';
-import { preferenceRules, logRules } from '../validators/reminder.validators.js';
-import * as push from '../controllers/push.controller.js';
-import { registerPushRules, deviceIdRules } from '../validators/push.validators.js';
-import * as phase13 from '../controllers/phase13.controller.js';
-import { idRule as phase13IdRule, growthCreate, medicalCreate, settingsRules, ticketRules, feedbackRules, bugRules } from '../validators/phase13.validators.js';
+import { adminLimiter, adminNoStore } from '../middleware/securityMiddleware.js';
+import * as admin from '../controllers/adminController.js';
+import * as adminNotification from '../controllers/adminNotificationController.js';
+import * as adminReport from '../controllers/adminReportController.js';
+import { adminUserListRules, adminUserIdRules, updateAdminUserStatusRules, deleteAdminUserRules, adminDoctorListRules, adminDoctorIdRules, createAdminDoctorRules, updateAdminDoctorRules, adminHospitalListRules, adminHospitalIdRules, createAdminHospitalRules, updateAdminHospitalRules, adminChildListRules, adminChildIdRules, adminNotificationListRules, adminNotificationIdRules, sendAdminNotificationRules, cancelAdminNotificationRules, adminAccountListRules, adminAccountIdRules, createAdminAccountRules, updateAdminAccountRules, resetAdminPasswordRules } from '../validators/adminValidators.js';
+import * as dashboard from '../controllers/dashboardController.js';
+import * as profile from '../controllers/profileController.js';
+import { updateProfileRules, changePasswordRules, deleteAccountRules } from '../validators/profileValidators.js';
+import * as child from '../controllers/childController.js';
+import { childIdRules, createChildRules, updateChildRules } from '../validators/childValidators.js';
+import * as vaccine from '../controllers/vaccineController.js';
+import { vaccineIdRules, vaccineListRules, createVaccineRules, updateVaccineRules } from '../validators/vaccineValidators.js';
+import * as schedule from '../controllers/scheduleController.js';
+import { childScheduleIdRules, generateScheduleRules, scheduleListRules } from '../validators/scheduleValidators.js';
+import * as immunization from '../controllers/immunizationController.js';
+import { createRecordRules, recordIdRules, recordListRules, updateRecordRules } from '../validators/immunizationValidators.js';
+import * as appointment from '../controllers/appointmentController.js';
+import * as hospitalAdmin from '../controllers/hospitalAdminController.js';
+import * as review from '../controllers/reviewController.js';
+import { createReviewRules } from '../validators/reviewValidators.js';
+import { appointmentIdRules, availabilityRules, createAppointmentRules, listAppointmentRules, rescheduleRules, statusRules } from '../validators/appointmentValidators.js';
+import * as reminder from '../controllers/reminderController.js';
+import { preferenceRules, logRules } from '../validators/reminderValidators.js';
+import * as push from '../controllers/pushController.js';
+import { registerPushRules, deviceIdRules } from '../validators/pushValidators.js';
+import * as phase13 from '../controllers/phase13Controller.js';
+import * as ai from '../controllers/aiController.js';
+import { vaccinationChatRules } from '../validators/aiValidators.js';
+import { idRule as phase13IdRule, growthCreate, medicalCreate, settingsRules, ticketRules, feedbackRules, bugRules } from '../validators/phase13Validators.js';
 
 const r = Router();
+
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many chatbot requests. Please try again later.' }
+});
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -92,8 +113,17 @@ r.post('/admin/notifications/:id/retry', authorizeRoles(ROLES.SYSTEM_ADMIN), adm
 r.patch('/admin/notifications/:id/cancel', authorizeRoles(ROLES.SYSTEM_ADMIN), cancelAdminNotificationRules, validate, adminNotification.cancelNotification);
 r.get('/admin/children', authorizeRoles(ROLES.SYSTEM_ADMIN), adminChildListRules, validate, admin.listAdminChildren);
 r.get('/admin/children/:id', authorizeRoles(ROLES.SYSTEM_ADMIN), adminChildIdRules, validate, admin.getAdminChild);
+r.get('/hospital-admin/doctors', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), hospitalAdmin.listDoctors);
+r.post('/hospital-admin/doctors', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), createAdminDoctorRules, validate, hospitalAdmin.createDoctor);
+r.delete('/hospital-admin/doctors/:id', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), adminDoctorIdRules, validate, hospitalAdmin.removeDoctor);
+r.get('/hospital-admin/parents', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), hospitalAdmin.listBookingParents);
+r.get('/hospital-admin/users', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), hospitalAdmin.listUsers);
+r.get('/hospital-admin/children', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN), hospitalAdmin.listChildren);
+
 r.get('/dashboard/parent', authenticate, authorizeRoles(ROLES.PARENT), dashboard.parentDashboard);
 r.get('/dashboard/doctor', authenticate, authorizeRoles(ROLES.DOCTOR), dashboard.doctorDashboard);
+
+r.post('/ai/vaccination-chat', authenticate, authorizeRoles(ROLES.PARENT), aiLimiter, vaccinationChatRules, validate, ai.vaccinationChat);
 
 r.route('/children')
   .get(authenticate, authorizeRoles(ROLES.PARENT), child.listChildren)
@@ -118,7 +148,7 @@ r.route('/vaccines/:id')
 
 r.patch('/vaccines/:id/status', authenticate, authorizeRoles(ROLES.HOSPITAL_ADMIN, ROLES.SYSTEM_ADMIN), vaccineIdRules, validate, vaccine.toggleVaccineStatus);
 
-r.get('/vaccine-schedules', authenticate, authorizeRoles(ROLES.PARENT), scheduleListRules, validate, schedule.listSchedules);
+r.get('/vaccine-schedules', authenticate, authorizeRoles(ROLES.PARENT, ROLES.DOCTOR, ROLES.HOSPITAL_ADMIN, ROLES.SYSTEM_ADMIN), scheduleListRules, validate, schedule.listSchedules);
 r.get('/vaccine-schedules/upcoming', authenticate, authorizeRoles(ROLES.PARENT), schedule.upcomingSchedules);
 r.get('/vaccine-schedules/due', authenticate, authorizeRoles(ROLES.PARENT), schedule.dueSchedules);
 r.get('/vaccine-schedules/overdue', authenticate, authorizeRoles(ROLES.PARENT), schedule.overdueSchedules);
@@ -145,6 +175,8 @@ r.route('/appointments')
   .post(authenticate, authorizeRoles(ROLES.PARENT), createAppointmentRules, validate, appointment.bookAppointment);
 r.patch('/appointments/:id/status', authenticate, authorizeRoles(ROLES.PARENT, ROLES.DOCTOR, ROLES.HOSPITAL_ADMIN, ROLES.SYSTEM_ADMIN), appointmentIdRules, statusRules, validate, appointment.updateStatus);
 r.patch('/appointments/:id/reschedule', authenticate, authorizeRoles(ROLES.PARENT, ROLES.DOCTOR, ROLES.HOSPITAL_ADMIN, ROLES.SYSTEM_ADMIN), appointmentIdRules, rescheduleRules, validate, appointment.reschedule);
+r.post('/appointments/:id/review', authenticate, authorizeRoles(ROLES.PARENT), appointmentIdRules, createReviewRules, validate, review.createReview);
+r.get('/doctor/reviews', authenticate, authorizeRoles(ROLES.DOCTOR), review.listDoctorReviews);
 
 r.route('/growth')
   .get(authenticate, authorizeRoles(ROLES.PARENT), c.growth)
@@ -170,6 +202,8 @@ r.get('/notification-logs', authenticate, logRules, validate, reminder.listLogs)
 r.post('/admin/reminders/run', authorizeRoles(ROLES.SYSTEM_ADMIN), reminder.runNow);
 
 r.get('/notifications', authenticate, c.notifications);
+r.delete('/notifications', authenticate, c.deleteAllNotifications);
+r.delete('/notifications/:id', authenticate, [param('id').isInt({ min: 1 }).withMessage('Valid notification id is required')], validate, c.deleteNotification);
 r.post('/notifications/push-token', authenticate, registerPushRules, validate, push.register);
 r.delete('/notifications/push-token/:deviceId', authenticate, deviceIdRules, validate, push.remove);
 r.post('/admin/push/send-pending', authorizeRoles(ROLES.SYSTEM_ADMIN), push.sendPending);

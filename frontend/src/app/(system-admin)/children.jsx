@@ -1,7 +1,14 @@
+/**
+ * File: frontend/src/app/(system-admin)/children.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
 import { useApp } from '@/context/AppContext';
 export default function ChildrenScreen() {
     const { theme } = useApp();
@@ -44,7 +51,7 @@ export default function ChildrenScreen() {
   <Card><Text style={[styles.section, { color: theme.text }]}>Profile</Text><Text style={{ color: theme.muted }}>Parent: {detail.child.parent_name}</Text><Text style={{ color: theme.muted }}>Email: {detail.child.parent_email}</Text><Text style={{ color: theme.muted }}>DOB: {String(detail.child.dob).slice(0, 10)} · Gender: {detail.child.gender}</Text><Text style={{ color: theme.muted }}>Blood group: {detail.child.blood_group || 'Not recorded'}</Text><Text style={{ color: theme.muted }}>Allergies: {detail.child.allergies || 'None recorded'}</Text><Text style={{ color: theme.muted }}>Medical notes: {detail.child.medical_notes || 'None recorded'}</Text></Card>
   <Section title="Appointments" data={detail.appointments} empty="No appointments" render={(x) => <Text style={{ color: theme.muted }}>{String(x.appointment_date).slice(0, 10)} {x.appointment_time} · {x.doctor_name} · {x.hospital_name} · {x.status}</Text>}/>
   <Section title="Vaccine schedule" data={detail.schedules} empty="No vaccine schedule" render={(x) => <Text style={{ color: theme.muted }}>{x.vaccine_name} dose {x.dose_number} · Due {String(x.due_date).slice(0, 10)} · {x.status}</Text>}/>
-  <Section title="Immunisation history" data={detail.immunizations} empty="No immunisation records" render={(x) => <Text style={{ color: theme.muted }}>{x.vaccine_name} · {String(x.administered_on || '').slice(0, 10)} · {x.doctor_name || 'Doctor not recorded'}</Text>}/>
+  <Section title="Immunisation history" data={detail.immunizations} empty="No immunisation records" render={(x) => <Text style={{ color: theme.muted }}>{x.vaccine_name} · {String(x.vaccination_date || '').slice(0, 10)} · {x.doctor_name || 'Doctor not recorded'}</Text>}/>
   <Section title="Growth records" data={detail.growth_records} empty="No growth records" render={(x) => <Text style={{ color: theme.muted }}>{String(x.measured_on).slice(0, 10)} · {x.height_cm} cm · {x.weight_kg} kg{x.head_circumference_cm ? ` · Head ${x.head_circumference_cm} cm` : ''}</Text>}/>
   <Section title="Medical history" data={detail.medical_history} empty="No medical history" render={(x) => <Text style={{ color: theme.muted }}>{String(x.record_date).slice(0, 10)} · {x.record_type} · {x.title}{x.description ? ` — ${x.description}` : ''}</Text>}/>
  </ScrollView></Screen>;

@@ -1,9 +1,17 @@
+/**
+ * File: frontend/src/app/(system-admin)/admin-users.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
-import { confirmAction } from '@/utils/confirmAction';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { confirmAction } from '@/utils/confirmationUtils';
 import { useApp } from '@/context/AppContext';
+import { showToast } from '@/components/ui/Feedback';
 const blankForm = { name: '', email: '', phone: '', password: '', role: 'HOSPITAL_ADMIN', hospital_id: '' };
 export default function AdminUsersScreen() {
     const { theme } = useApp();
@@ -52,7 +60,7 @@ export default function AdminUsersScreen() {
                 await api.put(`/admin/admin-users/${editing.id}`, payload);
             else
                 await api.post('/admin/admin-users', payload);
-            Alert.alert('Success', editing ? 'Admin updated successfully.' : 'Admin created successfully.');
+            showToast(editing ? 'Admin updated successfully.' : 'Admin created successfully.');
             clearForm();
             await load(1);
         }

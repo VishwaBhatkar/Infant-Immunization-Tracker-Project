@@ -1,3 +1,10 @@
+/**
+ * File: backend/scripts/check-syntax.js
+ * Purpose: Provides a command-line maintenance or project verification utility.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import { readdirSync } from 'node:fs';
 import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -1,11 +1,18 @@
+/**
+ * File: frontend/src/app/(parent)/profile.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
 import { useApp } from '@/context/AppContext';
-import { api } from '@/services/api';
-import { showToast } from '@/components/Feedback';
-import { confirmAction } from '@/utils/confirmAction';
+import { api } from '@/services/apiService';
+import { showToast } from '@/components/ui/Feedback';
+import { confirmAction } from '@/utils/confirmationUtils';
 export default function ProfileScreen() {
     const { user, theme, logout, refreshProfile } = useApp();
     const [name, setName] = useState(user?.name ?? '');
@@ -100,7 +107,7 @@ export default function ProfileScreen() {
       <Btn title="Change password" onPress={() => void changePassword()} loading={changingPassword} variant="secondary"/>
 
       <Text style={[styles.heading, { color: theme.text }]}>Account</Text>
-      <Btn title="Logout" variant="outline" onPress={async () => { await logout(); showToast('Logged out successfully'); router.replace('/(auth)/login'); }}/>
+      <Btn title="Logout" variant="outline" onPress={async () => { const confirmed = await confirmAction('Logout?', 'Are you sure you want to sign out?', 'Logout', 'Stay logged in'); if (!confirmed) return; await logout(); showToast('Logged out successfully', 'info'); router.replace('/(auth)/login'); }}/>
 
       <View style={styles.dangerSection}>
         <Text style={[styles.heading, { color: theme.text }]}>Delete account</Text>

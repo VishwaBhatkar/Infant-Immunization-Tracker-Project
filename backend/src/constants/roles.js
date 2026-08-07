@@ -1,3 +1,10 @@
+/**
+ * File: backend/src/constants/roles.js
+ * Purpose: Stores shared constant values used across the application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 // Define all supported user roles
 export const ROLES = Object.freeze({
   PARENT: 'PARENT',

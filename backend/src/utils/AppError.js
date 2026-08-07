@@ -1,4 +1,11 @@
 /**
+ * File: backend/src/utils/appError.js
+ * Purpose: Provides reusable helper functions shared across multiple modules.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
+/**
  * Operational application error used by controllers and middleware.
  * Both named and default exports are provided because the existing
  * codebase uses both import styles.

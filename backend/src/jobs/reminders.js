@@ -1,5 +1,12 @@
+/**
+ * File: backend/src/jobs/reminders.js
+ * Purpose: Defines background or scheduled processing performed independently of an HTTP request.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import cron from 'node-cron';
-import { runReminderCycle } from '../services/reminder.service.js';
+import { runReminderCycle } from '../services/reminderService.js';
 
 // Start the scheduled reminder job
 export const startReminderJob = () =>

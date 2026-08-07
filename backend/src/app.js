@@ -1,12 +1,19 @@
+/**
+ * File: backend/src/app.js
+ * Purpose: Bootstraps the backend application, shared middleware, routes, and server lifecycle.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import routes from './routes/index.js';
-import { notFound, errorHandler } from './middleware/error.js';
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { pool } from './config/db.js';
-import { requestContext } from './middleware/security.js';
+import { requestContext } from './middleware/securityMiddleware.js';
 
 const app = express();
 

@@ -1,9 +1,17 @@
+/**
+ * File: frontend/src/app/(system-admin)/users.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
-import { confirmAction } from '@/utils/confirmAction';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { confirmAction } from '@/utils/confirmationUtils';
 import { useApp } from '@/context/AppContext';
+import { showToast } from '@/components/ui/Feedback';
 const statuses = ['active', 'inactive', 'deleted', 'all'];
 const roles = ['', 'PARENT', 'DOCTOR', 'HOSPITAL_ADMIN', 'SYSTEM_ADMIN'];
 export default function UsersScreen() {
@@ -41,7 +49,7 @@ export default function UsersScreen() {
         try {
             setWorkingId(user.id);
             await api.patch(`/admin/users/${user.id}/status`, { is_active: activating });
-            Alert.alert('Success', `User ${activating ? 'activated' : 'deactivated'} successfully.`);
+            showToast(`User ${activating ? 'activated' : 'deactivated'} successfully.`);
             await loadUsers(pagination.page);
         }
         catch (error) {
@@ -58,7 +66,7 @@ export default function UsersScreen() {
         try {
             setWorkingId(user.id);
             await api.delete(`/admin/users/${user.id}`, { data: { reason: 'Deleted from System Admin user management' } });
-            Alert.alert('Success', 'User deleted successfully.');
+            showToast('User deleted successfully.');
             await loadUsers(1);
         }
         catch (error) {
@@ -75,7 +83,7 @@ export default function UsersScreen() {
         try {
             setWorkingId(user.id);
             await api.patch(`/admin/users/${user.id}/restore`);
-            Alert.alert('Success', 'User restored successfully.');
+            showToast('User restored successfully.');
             await loadUsers(pagination.page);
         }
         catch (error) {

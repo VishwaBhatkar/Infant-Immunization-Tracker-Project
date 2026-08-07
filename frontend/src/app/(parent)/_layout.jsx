@@ -1,6 +1,13 @@
+/**
+ * File: frontend/src/app/(parent)/_layout.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import { Tabs } from 'expo-router';
-import { RoleGuard } from '@/components/RoleGuard';
-import { RoleTabs } from '@/components/RoleTabs';
+import { RoleGuard } from '@/components/navigation/RoleGuard';
+import { RoleTabs } from '@/components/navigation/RoleTabs';
 export default function ParentLayout() {
     return (<RoleGuard allowedRoles={['PARENT']}>
       <RoleTabs>
@@ -8,6 +15,7 @@ export default function ParentLayout() {
         <Tabs.Screen name="children" options={{ title: 'Children' }}/>
         <Tabs.Screen name="schedule" options={{ title: 'Vaccines' }}/>
         <Tabs.Screen name="appointments" options={{ title: 'Appointments' }}/>
+        <Tabs.Screen name="assistant" options={{ title: 'AI Assistant' }}/>
         <Tabs.Screen name="growth" options={{ title: 'Growth' }}/>
         <Tabs.Screen name="immunizations" options={{ title: 'Records' }}/>
         <Tabs.Screen name="medical" options={{ title: 'Medical' }}/>

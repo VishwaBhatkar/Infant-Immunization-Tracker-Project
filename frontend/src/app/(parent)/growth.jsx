@@ -1,10 +1,17 @@
+/**
+ * File: frontend/src/app/(parent)/growth.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
 import { useApp } from '@/context/AppContext';
-import { showToast } from '@/components/Feedback';
-import { confirmAction } from '@/utils/confirmAction';
+import { showToast } from '@/components/ui/Feedback';
+import { confirmAction } from '@/utils/confirmationUtils';
 const blank = { height_cm: '', weight_kg: '', head_circumference_cm: '', measured_on: new Date().toISOString().slice(0, 10), notes: '' };
 export default function Growth() {
     const { theme } = useApp();

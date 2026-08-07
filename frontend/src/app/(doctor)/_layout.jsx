@@ -1,6 +1,13 @@
+/**
+ * File: frontend/src/app/(doctor)/_layout.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import { Tabs } from 'expo-router';
-import { RoleGuard } from '@/components/RoleGuard';
-import { RoleTabs } from '@/components/RoleTabs';
+import { RoleGuard } from '@/components/navigation/RoleGuard';
+import { RoleTabs } from '@/components/navigation/RoleTabs';
 export default function DoctorLayout() {
     return (<RoleGuard allowedRoles={['DOCTOR']}>
       <RoleTabs>

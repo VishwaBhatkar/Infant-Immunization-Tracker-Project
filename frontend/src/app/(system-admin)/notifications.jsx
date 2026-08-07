@@ -1,9 +1,17 @@
+/**
+ * File: frontend/src/app/(system-admin)/notifications.jsx
+ * Purpose: Defines an Expo Router screen, layout, or route entry for the mobile/web application.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { api } from '@/services/api';
-import { Btn, Card, Input, Screen, showError } from '@/components/UI';
-import { confirmAction } from '@/utils/confirmAction';
+import { api } from '@/services/apiService';
+import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { confirmAction } from '@/utils/confirmationUtils';
 import { useApp } from '@/context/AppContext';
+import { showToast } from '@/components/ui/Feedback';
 const statuses = ['all', 'PENDING', 'SENT', 'DELIVERED', 'FAILED', 'CANCELLED', 'SKIPPED'];
 export default function NotificationsScreen() {
     const { theme } = useApp();
@@ -33,7 +41,7 @@ export default function NotificationsScreen() {
     } try {
         setWorking(0);
         await api.post('/admin/notifications/send', { user_id: Number(userId), title: title.trim(), message: message.trim(), type: 'GENERAL' });
-        Alert.alert('Success', 'Notification queued successfully.');
+        showToast('Notification queued successfully.');
         setUserId('');
         setTitle('');
         setMessage('');

@@ -1,13 +1,22 @@
+/**
+ * File: backend/src/server.js
+ * Purpose: Bootstraps the backend application, shared middleware, routes, and server lifecycle.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import 'dotenv/config';
 import app from './app.js';
 import { pool, testDb } from './config/db.js';
 import { startReminderJob } from './jobs/reminders.js';
+import { ensureReviewSchema } from './services/schemaService.js';
 
 const port = Number(process.env.PORT || 5000);
 let reminderTask;
 
 try {
   await testDb();
+  await ensureReviewSchema();
   reminderTask = startReminderJob();
 
   const host = process.env.HOST || '0.0.0.0';

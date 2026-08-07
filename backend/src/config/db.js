@@ -1,3 +1,10 @@
+/**
+ * File: backend/src/config/db.js
+ * Purpose: Contains application configuration and shared infrastructure setup.
+ *
+ * Important: Comments in this file document the existing implementation.
+ * No business logic, API behavior, navigation behavior, or UI behavior is changed.
+ */
 import mysql from 'mysql2/promise';
 import 'dotenv/config';
 
