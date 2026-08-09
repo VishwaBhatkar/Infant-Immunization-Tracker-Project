@@ -1,0 +1,96 @@
+import React, { useMemo } from 'react';
+import { Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useApp } from '@/context/AppContext';
+
+const FALLBACK_RATIO = 16 / 9;
+
+function getSourceRatio(source) {
+  try {
+    const resolved = Image.resolveAssetSource(source);
+    if (resolved?.width && resolved?.height) return resolved.width / resolved.height;
+  } catch (_) {
+    // Remote/dynamic images may not expose dimensions synchronously.
+  }
+  return FALLBACK_RATIO;
+}
+
+export function HealthcareBanner({ source, eyebrow, title, subtitle, compact = false, accessibilityLabel }) {
+  const { isDark } = useApp();
+  const { width } = useWindowDimensions();
+  const small = width < 380;
+  const sourceRatio = useMemo(() => getSourceRatio(source), [source]);
+
+  // Keep the original image proportions on phones and tablets so faces/subjects
+  // are not stretched or unexpectedly cropped. On very wide web screens the
+  // banner is capped in width instead of forcing the image to become extremely tall.
+  const bannerMaxWidth = compact ? 760 : 980;
+
+  return (
+    <View style={[styles.shell, { maxWidth: bannerMaxWidth }, compact && styles.compactShell]}>
+      <ImageBackground
+        source={source}
+        resizeMode="cover"
+        accessibilityLabel={accessibilityLabel || title}
+        style={[styles.image, { aspectRatio: sourceRatio }]}
+        imageStyle={[styles.radius, compact && styles.compactRadius]}>
+        <View style={[styles.overlay, compact && styles.compactOverlay, small && styles.smallOverlay, isDark && styles.darkOverlay]}>
+          {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
+          {title ? <Text style={[styles.title, small && styles.smallTitle]} numberOfLines={small ? 3 : 2}>{title}</Text> : null}
+          {subtitle ? <Text style={[styles.subtitle, small && styles.smallSubtitle]} numberOfLines={small ? 4 : 3}>{subtitle}</Text> : null}
+        </View>
+      </ImageBackground>
+    </View>
+  );
+}
+
+export function HealthcareThumbnail({ source, accessibilityLabel, style }) {
+  const sourceRatio = useMemo(() => getSourceRatio(source), [source]);
+  return (
+    <Image
+      source={source}
+      resizeMode="contain"
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.thumbnail, { aspectRatio: sourceRatio }, style]}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  shell: {
+    width: '100%',
+    alignSelf: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+    marginBottom: 16,
+  },
+  compactShell: { borderRadius: 16, marginBottom: 12 },
+  image: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  radius: { borderRadius: 20 },
+  compactRadius: { borderRadius: 16 },
+  overlay: {
+    width: '100%',
+    paddingHorizontal: 18,
+    paddingTop: 42,
+    paddingBottom: 16,
+    backgroundColor: 'rgba(0, 92, 90, 0.42)',
+  },
+  compactOverlay: { paddingHorizontal: 14, paddingVertical: 12 },
+  smallOverlay: { paddingHorizontal: 13, paddingTop: 24, paddingBottom: 12 },
+  darkOverlay: { backgroundColor: 'rgba(2, 30, 40, 0.60)' },
+  eyebrow: { color: '#D9FFFC', fontSize: 11, fontWeight: '900', letterSpacing: 1.1, marginBottom: 5 },
+  title: { color: '#FFFFFF', fontSize: 22, lineHeight: 27, fontWeight: '900', maxWidth: 520, textShadowColor: 'rgba(0,0,0,0.28)', textShadowRadius: 3 },
+  smallTitle: { fontSize: 17, lineHeight: 21 },
+  subtitle: { color: '#F2FFFE', marginTop: 5, lineHeight: 19, maxWidth: 600, fontSize: 13 },
+  smallSubtitle: { fontSize: 11, lineHeight: 15 },
+  thumbnail: {
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
+    borderRadius: 16,
+    marginBottom: 12,
+  },
+});
