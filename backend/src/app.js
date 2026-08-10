@@ -23,10 +23,13 @@ if (trustProxyValue && !['false', '0', 'off', 'no'].includes(trustProxyValue)) {
   app.set('trust proxy', Number.isNaN(numericTrustProxy) ? process.env.TRUST_PROXY : numericTrustProxy);
 }
 
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:8081,http://localhost:19006')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = [
+  ...(process.env.CORS_ORIGINS || 'http://localhost:8081,http://localhost:19006')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+  'https://lastproject7953.netlify.app'
+];
 
 const isDevelopmentOrigin = (origin) => {
   if (process.env.NODE_ENV === 'production') return false;
