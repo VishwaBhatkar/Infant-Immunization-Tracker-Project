@@ -8,7 +8,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { api } from '@/services/apiService';
-import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { Btn, Card, DateInput, Screen, showError } from '@/components/ui/UI';
 import { useApp } from '@/context/AppContext';
 export default function ReportsScreen() {
     const { theme } = useApp();
@@ -36,7 +36,7 @@ export default function ReportsScreen() {
     const cards = data ? [['Active parents', data.users.active_parents], ['Active doctors', data.users.active_doctors], ['Appointments', data.appointments.total], ['Completed', data.appointments.completed], ['Vaccinations', data.vaccinations.completed], ['Notification success %', data.notifications.success_rate ?? 0]] : [];
     return <Screen><ScrollView contentContainerStyle={s.content}>
     <Text style={[s.title, { color: theme.text }]}>Reports & Analytics</Text><Text style={{ color: theme.muted }}>Review registrations, appointments, vaccination completion, notification delivery and hospital performance.</Text>
-    <Card><View style={s.row}><View style={s.field}><Input label="Start date" value={start} onChangeText={setStart} placeholder="YYYY-MM-DD"/></View><View style={s.field}><Input label="End date" value={end} onChangeText={setEnd} placeholder="YYYY-MM-DD"/></View></View><Btn title="Apply date range" onPress={() => load(1)}/></Card>
+    <Card><View style={s.row}><View style={s.field}><DateInput label="Start date" value={start} onChange={setStart} max={end || today}/></View><View style={s.field}><DateInput label="End date" value={end} onChange={setEnd} min={start} max={today}/></View></View><Btn title="Apply date range" onPress={() => load(1)}/></Card>
     <View style={s.grid}>{cards.map(([label, value]) => <Card key={String(label)}><Text style={[s.stat, { color: theme.primary }]}>{String(value ?? 0)}</Text><Text style={{ color: theme.muted }}>{label}</Text></Card>)}</View>
     <Card><Text style={[s.heading, { color: theme.text }]}>Appointment status</Text>{data && Object.entries(data.appointments).filter(([k]) => k !== 'total').map(([k, v]) => <Text key={k} style={{ color: theme.text, marginTop: 6 }}>{k}: {String(v ?? 0)}</Text>)}</Card>
     <Card><Text style={[s.heading, { color: theme.text }]}>Hospital performance</Text>{data?.hospital_performance?.length ? data.hospital_performance.map(h => <View key={h.id} style={s.item}><Text style={[s.itemTitle, { color: theme.text }]}>{h.name}</Text><Text style={{ color: theme.muted }}>Appointments {h.appointments} · Completed {h.completed_appointments} · Vaccinations {h.vaccinations}</Text></View>) : <Text style={{ color: theme.muted }}>No hospital activity in this range.</Text>}</Card>

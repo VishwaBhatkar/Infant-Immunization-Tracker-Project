@@ -11,6 +11,7 @@ import {
     Image,
     Alert,
     Animated,
+    Modal,
     Platform,
     Pressable,
     StyleSheet,
@@ -201,6 +202,97 @@ export const Input = ({ label, style, containerStyle, icon, ...props }) => {
     );
 };
 
+
+const parseCalendarDate = (value) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+    date.setHours(0, 0, 0, 0);
+    return date;
+};
+
+const formatCalendarDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+export const DateInput = ({ label = 'Date', value, onChange, min, max, placeholder = 'Select date', helperText, containerStyle, allowClear = false }) => {
+    const { theme } = useApp();
+    const [open, setOpen] = React.useState(false);
+    const selected = parseCalendarDate(value);
+    const minDate = parseCalendarDate(min);
+    const maxDate = parseCalendarDate(max);
+    const fallback = selected || maxDate || minDate || new Date();
+    const [month, setMonth] = React.useState(new Date(fallback.getFullYear(), fallback.getMonth(), 1));
+
+    useEffect(() => {
+        if (!open) return;
+        const next = parseCalendarDate(value) || maxDate || minDate || new Date();
+        setMonth(new Date(next.getFullYear(), next.getMonth(), 1));
+    }, [open, value, min, max]);
+
+    const moveMonth = (offset) => {
+        const next = new Date(month.getFullYear(), month.getMonth() + offset, 1);
+        const minMonth = minDate ? new Date(minDate.getFullYear(), minDate.getMonth(), 1) : null;
+        const maxMonth = maxDate ? new Date(maxDate.getFullYear(), maxDate.getMonth(), 1) : null;
+        if (minMonth && next < minMonth) return;
+        if (maxMonth && next > maxMonth) return;
+        setMonth(next);
+    };
+
+    const year = month.getFullYear();
+    const monthIndex = month.getMonth();
+    const firstDay = new Date(year, monthIndex, 1).getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const cells = Array(firstDay).fill(null).concat(Array.from({ length: daysInMonth }, (_, index) => index + 1));
+    while (cells.length % 7) cells.push(null);
+
+    return (
+        <View style={containerStyle}>
+            {label ? <Text style={[styles.label, { color: theme.text }]}>{label}</Text> : null}
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={label || placeholder}
+                onPress={() => setOpen(true)}
+                style={[styles.inputShell, { backgroundColor: theme.input, borderColor: theme.border }]}
+            >
+                <Ionicons name="calendar-outline" size={19} color={theme.muted} style={styles.inputIcon} />
+                <Text style={[styles.dateInputText, { color: value ? theme.text : theme.muted }]}>{value || placeholder}</Text>
+                <Ionicons name="chevron-down-outline" size={18} color={theme.muted} style={styles.dateChevron} />
+            </Pressable>
+            {helperText ? <Text style={[styles.dateHelper, { color: theme.muted }]}>{helperText}</Text> : null}
+            <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+                <Pressable style={styles.dateBackdrop} onPress={() => setOpen(false)}>
+                    <Pressable style={[styles.dateCard, { backgroundColor: theme.card, borderColor: theme.border }]} onPress={() => {}}>
+                        <View style={styles.dateHeader}>
+                            <Pressable onPress={() => moveMonth(-1)} style={[styles.dateArrow, { borderColor: theme.border }]}><Ionicons name="chevron-back" size={20} color={theme.text}/></Pressable>
+                            <Text style={[styles.dateTitle, { color: theme.text }]}>{month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</Text>
+                            <Pressable onPress={() => moveMonth(1)} style={[styles.dateArrow, { borderColor: theme.border }]}><Ionicons name="chevron-forward" size={20} color={theme.text}/></Pressable>
+                        </View>
+                        <View style={styles.dateWeekRow}>{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(day => <Text key={day} style={[styles.dateWeekDay, { color: theme.muted }]}>{day}</Text>)}</View>
+                        <View style={styles.dateGrid}>
+                            {cells.map((day, index) => {
+                                if (!day) return <View key={`blank-${index}`} style={styles.dateCell}/>;
+                                const candidate = new Date(year, monthIndex, day);
+                                candidate.setHours(0,0,0,0);
+                                const disabled = (minDate && candidate < minDate) || (maxDate && candidate > maxDate);
+                                const dateValue = formatCalendarDate(candidate);
+                                const isSelected = dateValue === value;
+                                return <Pressable key={dateValue} disabled={disabled} onPress={() => { onChange?.(dateValue); setOpen(false); }} style={[styles.dateCell, styles.dateDay, isSelected && { backgroundColor: theme.primary }, disabled && { opacity: 0.3 }]}><Text style={{ color: isSelected ? '#fff' : theme.text }}>{day}</Text></Pressable>;
+                            })}
+                        </View>
+                        {allowClear && value ? <Btn title="Clear date" variant="secondary" onPress={() => { onChange?.(''); setOpen(false); }}/> : null}
+                        <Btn title="Cancel" variant="outline" onPress={() => setOpen(false)}/>
+                    </Pressable>
+                </Pressable>
+            </Modal>
+        </View>
+    );
+};
+
 export const SectionHeader = ({ title, subtitle, icon = 'sparkles-outline', action }) => {
     const { theme } = useApp();
     return (
@@ -298,6 +390,19 @@ const styles = StyleSheet.create({
     },
     inputIcon: { marginLeft: 14 },
     input: { flex: 1, minHeight: 50, paddingHorizontal: 11, paddingVertical: 10, fontSize: 15 },
+    dateInputText: { flex: 1, paddingHorizontal: 11, fontSize: 15 },
+    dateChevron: { marginRight: 14 },
+    dateHelper: { fontSize: 12, marginTop: -7, marginBottom: 12 },
+    dateBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: 18 },
+    dateCard: { width: '100%', maxWidth: 440, borderWidth: 1, borderRadius: 18, padding: 16 },
+    dateHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+    dateArrow: { width: 40, height: 40, borderWidth: 1, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    dateTitle: { fontSize: 18, fontWeight: '800' },
+    dateWeekRow: { flexDirection: 'row', marginBottom: 5 },
+    dateWeekDay: { width: '14.2857%', textAlign: 'center', fontSize: 12, fontWeight: '700' },
+    dateGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+    dateCell: { width: '14.2857%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' },
+    dateDay: { borderRadius: 999 },
     sectionHeader: { width: '100%', minWidth: 0, flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 12 },
     sectionIcon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
     sectionText: { flex: 1, marginLeft: 11 },

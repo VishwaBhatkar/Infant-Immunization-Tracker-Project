@@ -8,7 +8,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { api } from '@/services/apiService';
-import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { Btn, Card, DateInput, Input, Screen, showError } from '@/components/ui/UI';
 import { HealthcareBanner, HealthcareThumbnail } from '@/components/ui/HealthcareImage';
 import { useApp } from '@/context/AppContext';
 import { showToast } from '@/components/ui/Feedback';
@@ -81,7 +81,7 @@ export default function Growth() {
       <Input placeholder="Height (cm)" keyboardType="decimal-pad" value={form.height_cm} onChangeText={v => setForm({ ...form, height_cm: v })}/>
       <Input placeholder="Weight (kg)" keyboardType="decimal-pad" value={form.weight_kg} onChangeText={v => setForm({ ...form, weight_kg: v })}/>
       <Input placeholder="Head circumference (cm, optional)" keyboardType="decimal-pad" value={form.head_circumference_cm} onChangeText={v => setForm({ ...form, head_circumference_cm: v })}/>
-      <Input placeholder="Date YYYY-MM-DD" value={form.measured_on} onChangeText={v => setForm({ ...form, measured_on: v })}/>
+      <DateInput label="Measurement date" value={form.measured_on} onChange={v => setForm({ ...form, measured_on: v })} max={new Date().toISOString().slice(0, 10)}/>
       <Input placeholder="Notes" multiline value={form.notes} onChangeText={v => setForm({ ...form, notes: v })}/>
       <Btn title={editingId ? 'Update record' : 'Add record'} onPress={save} loading={saving}/>{editingId ? <Btn title="Cancel editing" onPress={reset}/> : null}
     </Card></>} renderItem={({ item }) => <Card><Text style={{ color: theme.text, fontWeight: '800' }}>{String(item.measured_on).slice(0, 10)}</Text><Text style={{ color: theme.muted }}>{item.height_cm} cm • {item.weight_kg} kg</Text>{item.notes ? <Text style={{ color: theme.text }}>{item.notes}</Text> : null}<View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 24, marginTop: 12 }}><Pressable onPress={() => edit(item)}><Text style={{ color: theme.primary, fontWeight: '700' }}>Edit</Text></Pressable><Pressable onPress={() => remove(item.id)}><Text style={{ color: '#c62828', fontWeight: '700' }}>Delete</Text></Pressable></View></Card>} ListEmptyComponent={<View style={styles.emptyWrap}><HealthcareThumbnail source={require('../../../assets/images/real-life/growth-primary.webp')} accessibilityLabel="Child growth measurement" style={styles.emptyImage}/><Text style={{ color: theme.muted, textAlign: 'center' }}>No growth records found.</Text></View>}/></Screen>;

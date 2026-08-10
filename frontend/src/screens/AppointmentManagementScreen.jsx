@@ -8,7 +8,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
-import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { Btn, Card, DateInput, Input, Screen, showError } from '@/components/ui/UI';
 import { api } from '@/services/apiService';
 import { useApp } from '@/context/AppContext';
 import { showToast } from '@/components/ui/Feedback';
@@ -335,14 +335,15 @@ export default function AppointmentManagementScreen() {
                   {hospitals.map((hospital) => chip(hospital.name, form.hospital_id === String(hospital.id), () => chooseHospital(hospital.id), `hospital-${hospital.id}`))}
                 </View>
 
-                <Input placeholder="Date YYYY-MM-DD" value={form.appointment_date} onChangeText={(value) => {
-                    setForm((current) => ({
-                        ...current,
-                        appointment_date: value,
-                        appointment_time: '',
-                    }));
+                <DateInput
+                  label="Appointment date"
+                  value={form.appointment_date}
+                  min={new Date().toISOString().slice(0, 10)}
+                  onChange={(value) => {
+                    setForm((current) => ({ ...current, appointment_date: value, appointment_time: '' }));
                     setSlots([]);
-                }}/>
+                  }}
+                />
 
                 <Text style={{ color: theme.muted }}>Select doctor</Text>
                 {form.hospital_id && doctors.length === 0 ? (<Text style={{ color: theme.muted, marginBottom: 10 }}>
@@ -421,7 +422,7 @@ export default function AppointmentManagementScreen() {
             </View>)}
             {user?.role === 'DOCTOR' && rescheduleId === item.id && (<View style={{ marginTop: 12 }}>
               <Text style={{ color: theme.text, fontWeight: '800', marginBottom: 8 }}>Reschedule appointment</Text>
-              <Input placeholder="New date (YYYY-MM-DD)" value={rescheduleForm.appointment_date} onChangeText={(value) => setRescheduleForm((current) => ({ ...current, appointment_date: value, appointment_time: '' }))}/>
+              <DateInput label="New appointment date" value={rescheduleForm.appointment_date} min={new Date().toISOString().slice(0, 10)} onChange={(value) => setRescheduleForm((current) => ({ ...current, appointment_date: value, appointment_time: '' }))}/>
               <Text style={{ color: theme.muted, marginBottom: 6 }}>Available slots</Text>
               {validDate(rescheduleForm.appointment_date) && rescheduleSlots.length === 0 ? (<Text style={{ color: theme.muted, marginBottom: 10 }}>No slots available for this date.</Text>) : null}
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>

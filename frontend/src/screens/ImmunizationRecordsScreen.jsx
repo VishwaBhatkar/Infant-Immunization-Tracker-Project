@@ -7,7 +7,7 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { Btn, Card, Input, Screen, showError } from '@/components/ui/UI';
+import { Btn, Card, DateInput, Input, Screen, showError } from '@/components/ui/UI';
 import { HealthcareBanner } from '@/components/ui/HealthcareImage';
 import { api } from '@/services/apiService';
 import { useApp } from '@/context/AppContext';
@@ -150,9 +150,9 @@ export default function ImmunizationRecordsScreen({ canManage = false, title = '
               <Text style={[styles.label, { color: theme.text }]}>Doctor</Text>
               <View style={styles.chips}>{doctors.map((item) => <Choice key={item.id} selected={doctorId === String(item.id)} label={`Dr. ${item.name}`} onPress={() => setDoctorId(String(item.id))} theme={theme}/>)}</View>
             </>}
-            <Input label="Vaccination date" value={date} onChangeText={setDate}/>
+            <DateInput label="Vaccination date" value={date} onChange={setDate} max={new Date().toISOString().slice(0, 10)}/>
             <Input label="Batch number" value={batch} onChangeText={setBatch}/>
-            <Input label="Expiry date (optional)" value={expiry} onChangeText={setExpiry}/>
+            <DateInput label="Expiry date (optional)" value={expiry} onChange={setExpiry} allowClear/>
             <Input label="Injection site" value={site} onChangeText={setSite}/>
             <Input label="Notes" value={notes} onChangeText={setNotes} multiline/>
             <Input label="Proof image URL" value={proof} onChangeText={setProof} autoCapitalize="none"/>
