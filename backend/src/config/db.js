@@ -1,15 +1,6 @@
-/**
- * File: backend/src/config/db.js
- * Purpose: Contains application configuration and shared infrastructure setup.
- *
- * Important: Comments in this file document the existing implementation.
- * No business logic, API behavior, navigation behavior, or UI behavior is changed.
- */
 import mysql from 'mysql2/promise';
-import 'dotenv/config';
 
-// Create a MySQL connection pool
-const pool = mysql.createPool({
+export const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 4000),
   user: process.env.DB_USER,
@@ -25,7 +16,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-module.exports = pool;
+export default pool;
 
 // Verify the database connection
 export const testDb = async () => {
