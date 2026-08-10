@@ -100,7 +100,13 @@ const getAutomaticApiUrl = () => {
     if (Platform.OS === 'web' &&
         typeof window !== 'undefined') {
 
-        return `http://${window.location.hostname}:${port}/api`;
+        const isLocalWebHost =
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+
+        return isLocalWebHost
+            ? `http://${window.location.hostname}:${port}/api`
+            : 'https://infant-immunization-tracker-project-1.onrender.com/api';
     }
 
     // Detect development machine IP
