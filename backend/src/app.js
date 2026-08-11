@@ -28,7 +28,7 @@ const allowedOrigins = [
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean),
-  'https://lastproject7953.netlify.app'
+  'https://childvaccinationhealthtracker.netlify.app'
 ];
 
 const isDevelopmentOrigin = (origin) => {
